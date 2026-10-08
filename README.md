@@ -15,7 +15,7 @@ its own Dockerfile, pinned to the date of its dependencies.
 
 ```bash
 isoloom generate
-isoloom up docker
+isoloom run docker
 ```
 
 Then open http://localhost:9090/, register a user and open Learn. The same spec runs as Docker on
