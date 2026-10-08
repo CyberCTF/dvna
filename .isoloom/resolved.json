@@ -1,0 +1,222 @@
+{
+  "generated_by_isoloom": "from isoloom.yml; don't edit: change the spec and run `isoloom generate` (`isoloom check` fails when this file is out of date)",
+  "resolved_version": 1,
+  "name": "dvna",
+  "instance": null,
+  "inputs": [],
+  "networks": {
+    "lab": {
+      "cidr": "10.60.12.0/24",
+      "docker_cidr": "10.60.12.0/24",
+      "internet": false,
+      "gateway": null,
+      "gateway_address": "10.60.12.1",
+      "router": null,
+      "controller": "10.60.12.253"
+    }
+  },
+  "reach": [],
+  "machines": {
+    "mysql-db": {
+      "access": false,
+      "supplied": false,
+      "shapes": [
+        "docker"
+      ],
+      "arch": "amd64",
+      "os": null,
+      "windows": false,
+      "addresses": {
+        "lab": "10.60.12.20"
+      },
+      "docker_addresses": {
+        "lab": "10.60.12.20"
+      },
+      "services": [
+        {
+          "port": 3306,
+          "name": "mysql",
+          "http": false,
+          "publish": null
+        }
+      ],
+      "depends_on": [],
+      "inputs": [],
+      "volumes": {},
+      "resources": {
+        "cpus": 1,
+        "memory_mb": 512,
+        "disk_gb": 20
+      },
+      "gateway_of": [],
+      "routes": [],
+      "default_gateway": null,
+      "offline": true
+    },
+    "app": {
+      "access": false,
+      "supplied": false,
+      "shapes": [
+        "docker"
+      ],
+      "arch": "amd64",
+      "os": null,
+      "windows": false,
+      "addresses": {
+        "lab": "10.60.12.10"
+      },
+      "docker_addresses": {
+        "lab": "10.60.12.10"
+      },
+      "services": [
+        {
+          "port": 9090,
+          "name": "web",
+          "http": true,
+          "publish": 9090
+        }
+      ],
+      "depends_on": [
+        "mysql-db"
+      ],
+      "inputs": [],
+      "volumes": {},
+      "resources": {
+        "cpus": 1,
+        "memory_mb": 512,
+        "disk_gb": 20
+      },
+      "gateway_of": [],
+      "routes": [],
+      "default_gateway": null,
+      "offline": true
+    }
+  },
+  "start_order": [
+    "mysql-db",
+    "app"
+  ],
+  "clones": {},
+  "tools": {},
+  "groups": {},
+  "router": null,
+  "controller": {
+    "addresses": {
+      "lab": "10.60.12.253"
+    }
+  },
+  "published": [
+    {
+      "machine": "app",
+      "port": 9090,
+      "host_port": 9090
+    }
+  ],
+  "targets": {
+    "possible": [
+      "docker",
+      "hosted",
+      "docker-vm",
+      "cloud-docker",
+      "kubernetes"
+    ],
+    "generated": [
+      "docker",
+      "hosted",
+      "docker-vm",
+      "cloud-docker",
+      "kubernetes"
+    ],
+    "refused": {},
+    "not_possible": {
+      "hybrid": "only when some machines are containers and others are VMs",
+      "vagrant": "needs `vm:` on mysql-db, app",
+      "proxmox": "needs `vm:` on mysql-db, app",
+      "cloud-vm": "needs `vm:` on mysql-db, app",
+      "external": "needs `external:` on mysql-db, app"
+    }
+  },
+  "checks": {
+    "default_position": "networks",
+    "positions": [
+      {
+        "position": "networks",
+        "machine": null,
+        "runner": "isoloom-check",
+        "checks": [
+          {
+            "name": "the login page answers",
+            "derived": false,
+            "kind": "http",
+            "target": "http://app:9090/login",
+            "expect": "200",
+            "wait": 180
+          },
+          {
+            "name": "the registration page answers",
+            "derived": false,
+            "kind": "http",
+            "target": "http://app:9090/register",
+            "expect": "200",
+            "wait": 30
+          },
+          {
+            "name": "a new user registers",
+            "derived": false,
+            "kind": "script",
+            "target": "checks/register.sh",
+            "expect": "",
+            "wait": 0
+          }
+        ]
+      },
+      {
+        "position": "mysql-db",
+        "machine": "mysql-db",
+        "runner": "isoloom-check-mysql-db",
+        "checks": [
+          {
+            "name": "app:9090 from mysql-db",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.12.10:9090/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "no internet from mysql-db",
+            "derived": true,
+            "kind": "http",
+            "target": "http://1.1.1.1/",
+            "expect": "blocked",
+            "wait": 0
+          }
+        ]
+      },
+      {
+        "position": "app",
+        "machine": "app",
+        "runner": "isoloom-check-app",
+        "checks": [
+          {
+            "name": "mysql-db:3306 from app",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.12.20:3306",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "no internet from app",
+            "derived": true,
+            "kind": "http",
+            "target": "http://1.1.1.1/",
+            "expect": "blocked",
+            "wait": 0
+          }
+        ]
+      }
+    ]
+  },
+  "message": "DVNA answers at http://localhost:9090/. Register a user, then\nopen Learn: each OWASP Top 10 entry links to its vulnerable page and the guide in\nbuild/app/app/docs/.\n"
+}

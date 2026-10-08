@@ -1,0 +1,40 @@
+# yaml-language-server: $schema=https://www.isoloom.com/schema/v1.json
+# Damn Vulnerable NodeJS Application, DVNA (by Appsecco) as an Isoloom spec: the upstream source,
+# vendored unchanged in build/app/app/, built by its Dockerfile with dependencies pinned by date
+# and the database settings baked in, plus the MySQL 5.7 server of upstream's compose file.
+# `isoloom generate`, then `isoloom up docker`.
+version: 1
+name: dvna
+
+networks:
+  lab: { cidr: 10.60.12.0/24, internet: false }
+
+machines:
+  mysql-db:
+    networks: { lab: 20 }
+    services: [{ port: 3306, name: mysql }]
+    resources: { cpus: 1, memory_mb: 512 }
+    docker:
+      build: build/mysql-db
+
+  app:
+    networks: { lab: 10 }
+    services: [{ port: 9090, name: web, http: true, publish: 9090 }]
+    depends_on: [mysql-db]
+    resources: { cpus: 1, memory_mb: 512 }
+    docker:
+      build: build/app
+
+checks:
+  - name: the login page answers
+    http: http://app:9090/login
+    wait: 180
+  - name: the registration page answers
+    http: http://app:9090/register
+  - name: a new user registers
+    script: checks/register.sh
+
+message: |
+  DVNA answers at http://localhost:{{ machines.app.services.0.publish }}/. Register a user, then
+  open Learn: each OWASP Top 10 entry links to its vulnerable page and the guide in
+  build/app/app/docs/.
