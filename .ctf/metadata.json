@@ -4,6 +4,5 @@
   "question": "Exploit each OWASP Top 10 vulnerability listed on the Learn page.",
   "category": "WEB",
   "difficulty": 2,
-  "evidence_kind": "SECRET",
-  "capabilities": ["command-injection", "sql-injection", "xml-external-entity", "insecure-deserialization", "cross-site-scripting", "broken-access-control"]
+  "evidence_kind": "SECRET"
 }
