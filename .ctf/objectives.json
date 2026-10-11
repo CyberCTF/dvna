@@ -1,0 +1,35 @@
+{
+  "objectives": [
+    {
+      "key": "main",
+      "title": "Read the flag",
+      "prompt": "Register on DVNA, use its network tool page to run a command on the server, and read /ctf/flag.",
+      "check": { "evidence": "SECRET", "format": "FLAG{%s}" },
+      "dev": "FLAG{dev-dvna}",
+      "hints": [
+        "The Learn page's A1 Injection entry links to a page that pings an address.",
+        "The address is appended to a shell command string in core/appHandler.js. Which vulnerability class does that allow?"
+      ],
+      "steps": [
+        {
+          "key": "page",
+          "title": "Find the page",
+          "prompt": "Which DVNA page runs a network command with your input? (its path)",
+          "check": { "answer": ["/app/ping", "app/ping", "ping"] }
+        },
+        {
+          "key": "parameter",
+          "title": "Find the input",
+          "prompt": "Which form parameter is appended to that command?",
+          "check": { "answer": ["address"] }
+        },
+        {
+          "key": "class",
+          "title": "Name the flaw",
+          "prompt": "Which vulnerability class lets a second command of yours run on the server?",
+          "check": { "answer": ["command injection", "os command injection", "shell injection"] }
+        }
+      ]
+    }
+  ]
+}

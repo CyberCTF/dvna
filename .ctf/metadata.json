@@ -1,7 +1,7 @@
 {
   "title": "DVNA",
   "description": "Damn Vulnerable NodeJS Application by Appsecco: an Express and MySQL application that demonstrates the OWASP Top 10 (2017) in Node.js, from command and SQL injection to XXE, insecure deserialization and broken access control, with a guide for exploiting and fixing each flaw.",
-  "question": "Exploit each OWASP Top 10 vulnerability listed on the Learn page.",
+  "question": "Use the ping page's command injection to run a command on the server and read /ctf/flag.",
   "category": "WEB",
   "difficulty": 2,
   "evidence_kind": "SECRET"
